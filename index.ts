@@ -1,13 +1,14 @@
 
 import * as _ from 'lodash'
 
+import uid from 'unicoid'
+
 interface IConfBasicData {
     id: string;
     label?: string;
     createdAt?: number;
     updatedAt?: number;
     coords?: number[];
-
 }
 
 interface IBasicData {
@@ -27,12 +28,12 @@ interface IObjectToPlace {
     floorId?: string;
     buildingId?: string;
     roomId?: string;
-    external: boolean;
+    global: boolean;
     placeId: string;
     coords?: number[];
 }
 interface IConfObjectsToPlace extends IConfBasicData {
-    external: boolean;
+    global: boolean;
     coords?: number[];
 }
 
@@ -40,7 +41,7 @@ interface IPlace extends IBasicData {
     buildings: IBuilding[];
     floors: IFloor[];
     rooms: IRoom[];
-    externals: IObjectToPlace[];
+    globalObjects: IObjectToPlace[];
 }
 
 interface IConfBuilding extends IConfBasicData {
@@ -48,7 +49,6 @@ interface IConfBuilding extends IConfBasicData {
 }
 interface IConfFloor extends IConfBasicData {
     rooms: IConfRoom
-    externals: IConfObjectsToPlace[];
 }
 interface IConfRoom extends IConfBasicData {
     objects: IConfObjectsToPlace[]
@@ -56,42 +56,45 @@ interface IConfRoom extends IConfBasicData {
 interface IBuilding extends IcommonData {
     floors: IFloor[]
     rooms: IRoom[]
-
-
 }
 interface IFloor extends IcommonData {
     buildingId: string;
     rooms: IRoom[];
-    externals: IObjectToPlace[]
-
-
 }
 interface IRoom extends IcommonData {
     floorId: string;
     buildingId: string;
-
-
 }
 
-interface Ibuildconf {
+interface Ibuildconf extends IConfBasicData{
     buildings: IConfBuilding[];
-    coords?: number[];
-    externals:IConfObjectsToPlace[]
+    globalObjects: IConfObjectsToPlace[];
+
 }
 
 export default class Place implements IPlace {
-    id: string;
-    createdAt: number;
-    updatedAt: number;
-    objects: IObjectToPlace[];
-    coords?: number[];
+    id: string=uid(8)
+    createdAt: number=new Date().getTime();
+    updatedAt: number=new Date().getTime();
+    objects: IObjectToPlace[] = []
+    coords?: number[] = []
 
-    buildings: IBuilding[];
-    floors: IFloor[];
-    rooms: IRoom[];
-    externals: IObjectToPlace[];
-    constructor(buildingsconf: Ibuildconf) {
+    buildings: IBuilding[] = []
+    floors: IFloor[] = []
+    rooms: IRoom[] = []
+    globalObjects: IObjectToPlace[] = []
+    constructor(buildingsconf?: Ibuildconf) {
 
+        if (buildingsconf) { // could be validated
+
+            if (buildingsconf.id) this.id = buildingsconf.id
+            if (buildingsconf.createdAt) this.createdAt = buildingsconf.createdAt
+            if (buildingsconf.updatedAt) this.updatedAt = buildingsconf.updatedAt
+            if (buildingsconf.coords) this.coords = buildingsconf.coords
+
+
+
+        }
     }
 
     getBuildings() {
